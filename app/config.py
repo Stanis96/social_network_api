@@ -1,11 +1,12 @@
 import os
+import sys
 
 from dotenv import load_dotenv
-from pathlib import Path
 
 
-env_path = Path("..") / ".env"
-load_dotenv(dotenv_path=env_path)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
+sys.path.append(BASE_DIR)
 
 
 class Settings:
@@ -15,7 +16,7 @@ class Settings:
     POSTGRES_PORT: str = os.getenv("POSTGRES_PORT", 5432)
     POSTGRES_DB: str = os.getenv("POSTGRES_DB")
     DATABASE_URL = (
-        f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:"
+        f"postgresql+psycopg2://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}:"
         f"{POSTGRES_PORT}/{POSTGRES_DB}"
     )
 

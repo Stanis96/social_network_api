@@ -1,10 +1,10 @@
 import sqlalchemy
 
-from app.db.base_class import Base
+from app.db_session import Base
 
 
 class User(Base):
-    __tablename__ = "user"
+    __tablename__ = "users"
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     username = sqlalchemy.Column(sqlalchemy.String, unique=True, nullable=False)
