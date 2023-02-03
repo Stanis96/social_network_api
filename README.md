@@ -1,3 +1,4 @@
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 
   <h3 align="center">The API for a social networking application</h3>
 
@@ -31,4 +32,3 @@
     POSTGRES_PORT=#5432
     POSTGRES_DB=
     ```
-

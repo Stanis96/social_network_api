@@ -1,23 +1,23 @@
+from typing import Optional
+
 from fastapi import FastAPI
 
-# from db_session import engine
-from db_session import connect_db
-
-# from db_base import Base
-
-
-# def create_tables():
-#     print("create tables")
-#     Base.metadata.create_all(bind=engine)
+from app.config import settings
+from app.db.db_session import connect_db
+from app.routers.base import router
 
 
-def start_application():
+def include_router(app):
+    app.include_router(router)
+
+
+def start_application() -> FastAPI:
     app = FastAPI(
-        title="The mini blog",
-        version="0.0.1",
-        description="The test case",
+        title=settings.PROJECT_TITLE,
+        version=settings.PROJECT_VERSION,
+        description=settings.PROJECT_DESCRIPTION,
     )
-    # create_tables()
+    include_router(app)
     connect_db()
     return app
 
