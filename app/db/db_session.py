@@ -1,3 +1,5 @@
+from typing import Generator
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -19,7 +21,7 @@ def connect_db():
     print(f"Connection {engine.url}")
 
 
-def get_session():
+def get_session() -> Generator:
     session = SessionLocal()
     try:
         yield session

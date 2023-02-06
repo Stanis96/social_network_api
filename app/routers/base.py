@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
-from . import user_router
+from . import singin_router, user_router
 
-router = APIRouter()
-router.include_router(user_router.router, prefix="/users", tags=["users"])
+router_api = APIRouter()
+router_api.include_router(user_router.router, prefix="/users", tags=["users"])
+router_api.include_router(singin_router.router, prefix="/singin", tags=["singin"])
