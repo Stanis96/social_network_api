@@ -1,5 +1,7 @@
 import sqlalchemy
 
+from sqlalchemy.orm import relationship
+
 from app.db.db_session import Base
 
 
@@ -12,3 +14,4 @@ class User(Base):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     is_active = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
     is_admin = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
+    posts = relationship("Post", back_populates="owner")

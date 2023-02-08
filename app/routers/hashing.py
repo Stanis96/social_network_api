@@ -1,4 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import datetime
+from datetime import timedelta
+from typing import Any
 from typing import Optional
 
 from jose import jwt
@@ -6,16 +8,17 @@ from passlib.context import CryptContext
 
 from app.config import settings
 
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class Hasher:
     @staticmethod
-    def validate_password(plain_password, hashed_password) -> bool:
+    def validate_password(plain_password, hashed_password) -> Any:
         return pwd_context.verify(plain_password, hashed_password)
 
     @staticmethod
-    def get_password_hash(password) -> str:
+    def get_password_hash(password) -> Any:
         return pwd_context.hash(password)
 
 
