@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.db.db_session import get_session
-from app.routers.hashing import create_access_token
-from app.routers.utils import authenticate_user
+from app.routers.utils.hashing import create_access_token
+from app.routers.utils.user_utils import authenticate_user
 from app.schemas.token import Token
 
 

@@ -1,5 +1,4 @@
 from typing import Any
-from typing import List
 from typing import Optional
 
 from fastapi import Depends
@@ -14,8 +13,7 @@ from app import models
 from app import schemas
 from app.config import settings
 from app.db.db_session import get_session
-
-from .hashing import Hasher
+from app.routers.utils.hashing import Hasher
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/singin")
@@ -35,11 +33,15 @@ def create_new_user(user: schemas.UserCreate, db: Session) -> schemas.User:
     return user
 
 
-def get_user(username: str, db: Session) -> Optional[schemas.User]:
+def get_user(username: str, db: Session) -> Any:
     return db.query(models.User).filter(models.User.email == username).first()
 
 
-def get_all_users(db: Session) -> List[schemas.User]:
+def get_user_email(email: str, db: Session) -> Any:
+    return db.query(models.User).filter(models.User.email == email).first()
+
+
+def get_all_users(db: Session) -> Any:
     return db.query(models.User).filter(models.User.is_active == True).all()
 
 

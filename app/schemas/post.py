@@ -6,6 +6,18 @@ from pydantic import BaseModel
 
 class Post(BaseModel):
     id: int
+    user_id: int
+    title: str
+    content: str
+    date_creation: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class PostShow(BaseModel):
+    id: int
+    user_id: int
     title: str
     content: str
     date_creation: datetime
