@@ -17,7 +17,7 @@ class Post(BaseModel):
 
 class PostShow(BaseModel):
     id: int
-    user_id: int
+    owner_id: int
     title: str
     content: str
     date_creation: datetime

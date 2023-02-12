@@ -42,7 +42,7 @@ reaction_dislike = sqlalchemy.Table(
 class Post(Base):
     __tablename__ = "posts"
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, unique=True, autoincrement=True)
     title = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     content = sqlalchemy.Column(sqlalchemy.Text, nullable=False)
     date_creation = sqlalchemy.Column(sqlalchemy.DateTime, nullable=False, default=datetime.now())
@@ -55,3 +55,9 @@ class Post(Base):
     dislikes = relationship(
         "User", secondary=reaction_dislike, backref="dislikes", lazy="joined", single_parent=True
     )
+
+    def count_likes(self) -> int:
+        return len(self.likes)
+
+    def count_dislikes(self) -> int:
+        return len(self.dislikes)

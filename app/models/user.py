@@ -8,7 +8,7 @@ from app.db.db_session import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
+    id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, unique=True, autoincrement=True)
     username = sqlalchemy.Column(sqlalchemy.String, unique=True, nullable=False)
     email = sqlalchemy.Column(sqlalchemy.String, unique=True, nullable=False)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
