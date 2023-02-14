@@ -17,12 +17,12 @@ class Post(BaseModel):
 
 class PostShow(BaseModel):
     id: int
-    owner_id: int
+    user_id: int
     title: str
     content: str
     date_creation: datetime
-    likes: int
-    dislikes: int
+    likes_count: Optional[int] = None
+    dislikes_count: Optional[int] = None
 
     class Config:
         orm_mode = True

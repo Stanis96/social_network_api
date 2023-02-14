@@ -3,6 +3,7 @@ from typing import List
 
 from fastapi import HTTPException
 from fastapi import status
+from sqlalchemy import exc
 from sqlalchemy.orm import Session
 
 from app import models
@@ -17,23 +18,8 @@ def create_new_post(post: schemas.PostCreate, db: Session, user_id: int) -> sche
     return post_object
 
 
-def get_post_info(
-    posts: models.Post, count_likes: int = 0, count_dislikes: int = 0
-) -> schemas.PostShow:
-    return schemas.PostShow(
-        id=posts.id,
-        owner_id=posts.user_id,
-        title=posts.title,
-        content=posts.content,
-        date_creation=posts.date_creation,
-        likes=count_likes,
-        dislikes=count_dislikes,
-    )
-
-
 def get_all_posts(db: Session) -> List[schemas.PostShow]:
     posts: list = db.query(models.Post).all()
-    posts = [get_post_info(post, post.count_likes(), post.count_dislikes()) for post in posts]
     return posts
 
 
@@ -44,5 +30,85 @@ def get_current_post(post_id: int, db: Session) -> Any:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Post {post_id} didn't find",
         )
-    post = get_post_info(post_query, post_query.count_likes(), post_query.count_dislikes())
+    return post_query
+
+
+def update_current_post(post_id: int, user_id: int, db: Session, existing_post):
+    post = (
+        db.query(models.Post).filter(models.Post.id == post_id).first()
+    )  # optimization get_current_post
+    if post.user_id == user_id:
+        post.title = existing_post.title
+        post.content = existing_post.content
+        db.add(post)
+        db.commit()
+        return post
+
+
+def delete_current_post(post_id: int, user_id: int, db: Session):
+    post = (
+        db.query(models.Post).filter(models.Post.id == post_id).first()
+    )  # optimization get_current_post
+    if post.user_id == user_id:
+        db.delete(post)
+        db.commit()
+        return post
+
+
+def add_like(post_id: int, user_id: int, db: Session):
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+
+    if user_id == post.user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="You cannot like your post"
+        )
+
+    if user in post.likes:
+        post.likes.remove(user)
+        post.likes_count -= 1
+
+    else:
+        post.likes.append(user)
+        post.likes_count += 1
+
+        if user in post.dislikes:
+            post.dislikes.remove(user)
+            post.dislikes_count -= 1
+
+    try:
+        db.commit()
+        db.add(post)
+    except exc.IntegrityError:
+        db.rollback()
+    return post
+
+
+def add_dislike(post_id: int, user_id: int, db: Session):
+    post = db.query(models.Post).filter(models.Post.id == post_id).first()
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+
+    if user_id == post.user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="You cannot dislike your post"
+        )
+
+    if user in post.dislikes:
+        post.dislikes.remove(user)
+        post.dislikes_count -= 1
+
+    else:
+        post.dislikes.append(user)
+        post.dislikes_count += 1
+
+        if user in post.likes:
+            post.likes.remove(user)
+            post.likes_count -= 1
+
+    try:
+        db.commit()
+        db.add(post)
+    except exc.IntegrityError:
+        db.rollback()
+
     return post
