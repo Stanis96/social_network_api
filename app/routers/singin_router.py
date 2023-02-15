@@ -1,27 +1,29 @@
 from datetime import timedelta
+from typing import Any
 
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
 
 from app.config import settings
-from app.db.db_session import get_session
 from app.routers.utils.hashing import create_access_token
-from app.routers.utils.user_utils import authenticate_user
+from app.routers.utils.user_utils import UserService
 from app.schemas.token import Token
 
 
 router = APIRouter()
 
 
-@router.post("/", response_model=Token)
+@router.post("/", response_model=Token, status_code=200)
 def singin_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_session)
-):
-    user = authenticate_user(form_data.username, form_data.password, db)
+    form_data: OAuth2PasswordRequestForm = Depends(), user_tools: UserService = Depends()
+) -> Any:
+    """
+    Providing access token OAuth2.
+    """
+    user = user_tools.authenticate_user(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

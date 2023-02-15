@@ -22,7 +22,7 @@ class Hasher:
         return pwd_context.hash(password)
 
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> Any:
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta

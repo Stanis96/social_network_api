@@ -1,4 +1,5 @@
 from typing import Any
+from typing import List
 from typing import Optional
 
 from fastapi import Depends
@@ -7,6 +8,7 @@ from fastapi import status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
 from jose import jwt
+from sqlalchemy import exc
 from sqlalchemy.orm import Session
 
 from app import models
@@ -19,43 +21,9 @@ from app.routers.utils.hashing import Hasher
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/singin")
 
 
-def create_new_user(user: schemas.UserCreate, db: Session) -> schemas.User:
-    user = models.User(
-        username=user.username,
-        email=user.email,
-        hashed_password=Hasher.get_password_hash(user.password),
-        is_active=True,
-        is_admin=False,
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
-
-
-def get_user(username: str, db: Session) -> Any:
-    return db.query(models.User).filter(models.User.email == username).first()
-
-
-def get_user_email(email: str, db: Session) -> Any:
-    return db.query(models.User).filter(models.User.email == email).first()
-
-
-def get_all_users(db: Session) -> Any:
-    return db.query(models.User).filter(models.User.is_active == True).all()
-
-
-def authenticate_user(username: str, password: str, db: Session = Depends(get_session)):
-    user = get_user(username=username, db=db)
-    print(user)
-    if not user:
-        return False
-    if not Hasher.validate_password(password, user.hashed_password):
-        return False
-    return user
-
-
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_session)):
+def get_current_user(
+    token: str = Depends(oauth2_scheme), db: Session = Depends(get_session)
+) -> Any:
     data_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate data",
@@ -63,12 +31,60 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: Optional[Any] = payload.get("sub")
-        print("username/email from ", username)
         if username is None:
             raise data_exception
     except JWTError:
         raise data_exception
-    user = get_user(username=username, db=db)
+    user = UserService(db).get_user(username=username)
     if user is None:
         raise data_exception
     return user
+
+
+class UserService:
+    def __init__(self, db: Session = Depends(get_session)) -> None:
+        self.db = db
+
+    def create_new_user(self, user: schemas.UserCreate) -> schemas.User:
+        user = models.User(
+            username=user.username,
+            email=user.email,
+            hashed_password=Hasher.get_password_hash(user.password),
+            is_active=True,
+            is_admin=False,
+        )
+        try:
+            self.db.add(user)
+            self.db.commit()
+            self.db.refresh(user)
+        except exc.IntegrityError:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT, detail="This email address already exists"
+            )
+        return user
+
+    def get_user(self, username: str) -> Any:
+        user = self.db.query(models.User).filter(models.User.email == username).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"{username} not found!"
+            )
+        return user
+
+    def get_user_email(self, email: str) -> Any:
+        user = self.db.query(models.User).filter(models.User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{email} not found!")
+        return user
+
+    def get_all_users(self) -> List[models.User]:
+        users = self.db.query(models.User).filter(models.User.is_active == True).all()
+        return users
+
+    def authenticate_user(self, username: str, password: str) -> Any:
+        user = self.get_user(username=username)
+        if not user:
+            return False
+        if not Hasher.validate_password(password, user.hashed_password):
+            return False
+        return user
