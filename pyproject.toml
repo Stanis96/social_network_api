@@ -8,30 +8,31 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 
-fastapi = "0.91.0"
+fastapi = "0.92.0"
 uvicorn = "^0.20.0"
-sqlalchemy = "^2.0.3"
+sqlalchemy = "<1.4.46"
 psycopg2-binary = "^2.9.5"
-pydantic = {extras =["email"], version = "^1.10.4"}
-alembic = "^1.9.3"
+pydantic = {extras =["email"], version = "^1.10.5"}
+alembic = "^1.9.4"
 
 python-dotenv = "^0.21.1"
 
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 passlib = "^1.7.4"
-types-passlib = "^1.7.7.8"
+types-passlib = "^1.7.7.9"
 python-multipart = "^0.0.5"
 bcrypt = "^4.0.1"
 
 pytest = "^7.2.1"
 requests = "^2.28.2"
+httpx = "^0.23.3"
 
 [tool.poetry.dev-dependencies]
 black = "23.1.0"
 
 isort = "^5.12.0"
 
-mypy = "^1.0.0"
+mypy = "^1.0.1"
 
 flake8 = "6.0.0"
 flake8-black = "0.3.6"
