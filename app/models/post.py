@@ -51,9 +51,9 @@ class Post(Base):
     user_id = sqlalchemy.Column(
         sqlalchemy.Integer, sqlalchemy.ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    likes = relationship(
+    likes = relationship(  # type: ignore[misc]
         "User", secondary=reaction_like, backref="likes", lazy="joined", single_parent=True
     )
-    dislikes = relationship(
+    dislikes = relationship(  # type: ignore[misc]
         "User", secondary=reaction_dislike, backref="dislikes", lazy="joined", single_parent=True
     )

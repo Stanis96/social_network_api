@@ -29,7 +29,9 @@ def get_current_user(
         detail="Could not validate data",
     )
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]  # type:ignore
+        )
         username: Optional[Any] = payload.get("sub")
         if username is None:
             raise data_exception
@@ -45,8 +47,8 @@ class UserService:
     def __init__(self, db: Session = Depends(get_session)) -> None:
         self.db = db
 
-    def create_new_user(self, user: schemas.UserCreate) -> schemas.User:
-        user = models.User(
+    def create_new_user(self, user: schemas.UserCreate) -> models.User:
+        db_user = models.User(
             username=user.username,
             email=user.email,
             hashed_password=Hasher.get_password_hash(user.password),
@@ -54,14 +56,14 @@ class UserService:
             is_admin=False,
         )
         try:
-            self.db.add(user)
+            self.db.add(db_user)
             self.db.commit()
-            self.db.refresh(user)
+            self.db.refresh(db_user)
         except exc.IntegrityError:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT, detail="This email address already exists"
             )
-        return user
+        return db_user
 
     def get_user(self, username: str) -> Any:
         user = self.db.query(models.User).filter(models.User.email == username).first()
@@ -71,7 +73,7 @@ class UserService:
             )
         return user
 
-    def get_user_email(self, email: str) -> Any:
+    def get_user_email(self, email: Optional[str]) -> Any:
         user = self.db.query(models.User).filter(models.User.email == email).first()
         if not user:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{email} not found!")

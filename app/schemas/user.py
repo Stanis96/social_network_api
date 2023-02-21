@@ -5,14 +5,14 @@ from pydantic import EmailStr
 
 
 class UserBase(BaseModel):
-    username: Optional[str]
+    username: str
     email: Optional[EmailStr]
     is_active: Optional[bool] = True
     is_admin: bool = False
 
 
 class User(UserBase):
-    id: Optional[int] = None
+    id: int
 
     class Config:
         orm_mode = True

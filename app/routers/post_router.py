@@ -22,8 +22,8 @@ def create_post(
     Access is provided after authorization.
     Create a new post.
     """
-    post = post_tools.create_new_post(post, user_id=current_user.id)
-    return post
+    new_post = post_tools.create_new_post(post, user_id=current_user.id)
+    return new_post
 
 
 @router.get("/show_all", response_model=List[schemas.PostShow], status_code=200)

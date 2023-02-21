@@ -17,7 +17,7 @@ class Settings:
     PROJECT_DESCRIPTION: Optional[str] = os.getenv("PROJECT_DESCRIPTION")
 
     SECRET_KEY: Optional[str] = os.getenv("SECRET_KEY")
-    ALGORITHM: Optional[str] = os.getenv("ALGORITHM", default="HS256")
+    ALGORITHM: str = os.getenv("ALGORITHM", default="HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     POSTGRES_USER: Optional[str] = os.getenv("POSTGRES_USER")

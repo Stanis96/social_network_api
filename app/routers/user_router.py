@@ -1,5 +1,6 @@
 from typing import Any
 from typing import List
+from typing import Optional
 
 from fastapi import APIRouter
 from fastapi import Depends
@@ -18,8 +19,8 @@ def create_user(user: schemas.UserCreate, user_tools: UserService = Depends()) -
     """
     Creation a user when using a unique email address.
     """
-    user = user_tools.create_new_user(user)
-    return user
+    new_user = user_tools.create_new_user(user)
+    return new_user
 
 
 @router.get("/show_all", response_model=List[schemas.User], status_code=200)
@@ -47,7 +48,7 @@ def show_myself(current_user: models.User = Depends(get_current_user)) -> Any:
 def find_user_by_email(
     user_tools: UserService = Depends(),
     current_user: models.User = Depends(get_current_user),
-    email: str = None,
+    email: Optional[str] = None,
 ) -> Any:
     """
     Access is provided after authorization.

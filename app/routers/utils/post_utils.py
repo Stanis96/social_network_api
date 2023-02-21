@@ -16,7 +16,7 @@ class PostService:
     def __init__(self, db: Session = Depends(get_session)) -> None:
         self.db = db
 
-    def create_new_post(self, post: schemas.PostCreate, user_id: int) -> schemas.Post:
+    def create_new_post(self, post: schemas.PostCreate, user_id: int) -> models.Post:
         post_object = models.Post(**post.dict(), user_id=user_id)
         self.db.add(post_object)
         self.db.commit()

@@ -14,4 +14,4 @@ class User(Base):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     is_active = sqlalchemy.Column(sqlalchemy.Boolean, default=True)
     is_admin = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
-    posts = relationship("Post", backref="posts", cascade="all", lazy="joined")
+    posts = relationship("Post", backref="posts", cascade="all", lazy="joined")  # type:ignore[misc]

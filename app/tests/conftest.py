@@ -3,17 +3,16 @@ from typing import Generator
 
 import pytest
 
-from fastapi import Depends
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
 from app.config import settings
 from app.db.db_base import Base
 from app.db.db_session import get_session
 from app.routers.base import router_api
-from app.routers.utils.user_utils import UserService
 from app.tests.utils import authentication_token
 
 
@@ -60,7 +59,5 @@ def client(app: FastAPI, db_session: SessionTesting) -> Generator[TestClient, An
 
 
 @pytest.fixture(scope="module")
-def normal_user_token(client: TestClient, user_tools: UserService = Depends()):
-    return authentication_token(
-        client=client, email=settings.TEST_USER_EMAIL, user_tools=user_tools
-    )
+def normal_user_token(client: TestClient, db_session: Session):
+    return authentication_token(client=client, email=settings.TEST_USER_EMAIL, db=db_session)
