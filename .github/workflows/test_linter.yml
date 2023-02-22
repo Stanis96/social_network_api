@@ -1,0 +1,72 @@
+name: check_code
+
+on:
+    - push
+    - pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+        TEST_POSTGRES_USER: github_actions
+        TEST_POSTGRES_PASSWORD: github_actions
+        TEST_POSTGRES_SERVER: localhost
+        TEST_POSTGRES_PORT: 5433
+        TEST_POSTGRES_DB: github_actions
+        SECRET_KEY: secret_key
+        ALGORITHM: HS256
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.11'
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        version: 1.3.2
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        installer-parallel: true
+
+    - name: Load cached venv
+      id: cached-poetry-dependencies
+      uses: actions/cache@v2
+      with:
+        path: .venv
+        key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+    - name: Install dependencies
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+      run: poetry install --no-interaction --no-root
+
+    - name: Install library
+      run: poetry install --no-interaction
+
+    - name: venv activate
+      run: source .venv/bin/activate
+
+    - name: Run migrations
+      run: poetry run alembic upgrade head
+
+    - name: Run PyTest
+      run: poetry run pytest
+
+    - name: black
+      run: poetry run black .
+
+    - name: isort
+      run: poetry run isort .
+
+    - name: flake8
+      run: poetry run flake8 . --count
+
+    - name: mypy
+      run: |
+        source .venv/bin/activate
+        PYTHONPATH="$PYTHONPATH:$PWD" mypy .
+
+    - name: dotenv-linter
+      run: poetry run dotenv-linter .env_template
