@@ -48,9 +48,6 @@ jobs:
     - name: venv activate
       run: source .venv/bin/activate
 
-    - name: Run migrations
-      run: poetry run alembic upgrade head
-
     - name: Run PyTest
       run: poetry run pytest
 
