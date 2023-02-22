@@ -14,7 +14,17 @@ jobs:
         TEST_POSTGRES_DB: github_actions
         SECRET_KEY: secret_key
         ALGORITHM: HS256
-
+    
+    services:
+      db_test:
+        image: postgres:13.9
+        env:
+          POSTGRES_USER: github_actions
+          POSTGRES_PASSWORD: github_actions
+          POSTGRES_DB: github_actions
+        ports:
+          - 5433:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python 3.11
