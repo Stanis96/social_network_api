@@ -15,7 +15,7 @@
 ### Installation:
 * Clone the repository to a local directory:
   ```sh
-  git clone https://github.com/Stanis96/mini_blog_api.git
+  git clone https://github.com/Stanis96/social_network_api
   ```
 * Set your own variable values in ```.env_template``` and rename to ```.env```
 >Tip: The application uses a third-party PostgreSQL database service.
