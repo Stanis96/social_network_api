@@ -12,8 +12,8 @@ jobs:
         TEST_POSTGRES_PASSWORD: github_actions
         TEST_POSTGRES_SERVER: localhost
         TEST_POSTGRES_DB: github_actions
+        DATABASE_URL: github_actions
         SECRET_KEY: secret_key
-        ALGORITHM: HS256
     
     services:
       db_test:
