@@ -12,7 +12,7 @@ jobs:
         TEST_POSTGRES_PASSWORD: github_actions
         TEST_POSTGRES_SERVER: localhost
         TEST_POSTGRES_DB: github_actions
-        DATABASE_URL: github_actions
+        DATABASE_URL: postgresql+psycopg2://github_actions:github_actions@github_actions5432/github_actions
         SECRET_KEY: secret_key
     
     services:
