@@ -15,10 +15,11 @@ def test_create_user(client: Any) -> None:
         "password": "password1",
     }
     response = client.post("/users/create", json=data1)
+    result = response.json()
     assert response.status_code == 200
-    assert response.json()["email"] == settings.TEST_USER_EMAIL
-    assert response.json()["is_active"] == True
-    assert response.json()["is_admin"] == False
+    assert result["email"] == settings.TEST_USER_EMAIL
+    assert result["is_active"] == True
+    assert result["is_admin"] == False
 
 
 def test_show_users(client: Any, normal_user_token: dict[str, str]) -> None:
@@ -45,10 +46,11 @@ def test_show_users(client: Any, normal_user_token: dict[str, str]) -> None:
 
 def test_show_myself(client: Any, normal_user_token: dict[str, str]) -> None:
     response = client.get("/users/show_user", headers=normal_user_token)
+    result = response.json()
     assert response.status_code == 200
-    assert response.json()["email"] == settings.TEST_USER_EMAIL
-    assert response.json()["is_active"] == True
-    assert response.json()["is_admin"] == False
+    assert result["email"] == settings.TEST_USER_EMAIL
+    assert result["is_active"] == True
+    assert result["is_admin"] == False
 
 
 def test_find_user_by_email(client: Any, normal_user_token: dict[str, str]) -> None:
@@ -74,10 +76,11 @@ def test_create_post(client: Any, normal_user_token: dict[str, str]) -> None:
     }
 
     response = client.post("/posts/create", json=data1, headers=normal_user_token)
+    result = response.json()
     assert response.status_code == 200
-    assert response.json()["title"] == data1["title"]
-    assert response.json()["content"] == data1["content"]
-    assert "user_id" in response.json()
+    assert result["title"] == data1["title"]
+    assert result["content"] == data1["content"]
+    assert "user_id" in result
 
 
 def test_show_all(client: Any, normal_user_token: dict[str, str]) -> None:
